@@ -1,26 +1,35 @@
-FROM node:20 AS deps
+FROM node:18-alpine AS build
 
 WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm install
-#########################################
-FROM node:20 AS build
-
-WORKDIR /app
-
-COPY --from=deps /app/node_modules ./node_modules
+RUN npm ci --only=production
 
 COPY . .
 
-##########################################
-FROM node:20 AS runner
+RUN npm run build
 
-WORKDIR /app
+#####################################################
+FROM nginx:alpine
 
-COPY --from=build /app ./
+COPY --from=build /app/dist /usr/share/nginx/html
 
-EXPOSE 3000
 
-CMD ["npm", "start"]
+RUN echo "server {" > /etc/nginx/conf.d/default.conf && \
+    echo "    listen 80;" >> /etc/nginx/conf.d/default.conf && \
+    echo "    location / {" >> /etc/nginx/conf.d/default.conf && \
+    echo "        root /usr/share/nginx/html;" >> /etc/nginx/conf.d/default.conf && \
+    echo "        index index.html index.htm;" >> /etc/nginx/conf.d/default.conf && \
+    echo "        try_files \$uri \$uri/ /index.html;" >> /etc/nginx/conf.d/default.conf && \
+    echo "    }" >> /etc/nginx/conf.d/default.conf && \
+    echo "    error_page 500 502 503 504 /50x.html;" >> /etc/nginx/conf.d/default.conf && \
+    echo "    location = /50x.html {" >> /etc/nginx/conf.d/default.conf && \
+    echo "        root /usr/share/nginx/html;" >> /etc/nginx/conf.d/default.conf && \
+    echo "    }" >> /etc/nginx/conf.d/default.conf && \
+    echo "}" >> /etc/nginx/conf.d/default.conf
+
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]

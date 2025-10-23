@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-const base_url = "http://chat-network:4000";
-const chat_url = "http://chat-network:8000";
+const base_url = "http://localhost:4000";
+const chat_url = "http://localhost:8000";
 
 export const useAuthStore = create((set, get) => ({
   accessToken: localStorage.getItem('accessToken') || null,

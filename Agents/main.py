@@ -18,7 +18,7 @@ app.add_middleware(
 )
 
 class Message(BaseModel):
-    role: str  # "user" or "assistant"
+    role: str  
     content: str
 
 class ChatRequest(BaseModel):
@@ -73,33 +73,27 @@ async def chat(request: ChatRequest):
     try:
         from datetime import datetime
         
-        # Initialize LLM
         llm = get_llm(
             temperature=request.temperature,
             max_tokens=request.max_tokens
         )
         
-        # Build conversation context
         messages = []
         
-        # System message to set bot personality
         system_prompt = SystemMessage(content="""You are Agon, a helpful and friendly AI assistant. 
         You provide clear, accurate, and concise responses to user questions. 
         You are knowledgeable across various topics and always maintain a professional yet approachable tone.
         If you don't know something, you admit it honestly.""")
         messages.append(system_prompt)
         
-        # Add conversation history
         for msg in request.conversation_history:
             if msg.role == "user":
                 messages.append(HumanMessage(content=msg.content))
             elif msg.role == "assistant":
                 messages.append(SystemMessage(content=f"Previous Agon response: {msg.content}"))
         
-        # Add current user message
         messages.append(HumanMessage(content=request.message))
         
-        # Get response from Gemini
         response = llm.invoke(messages)
         
         # Return JSON response
