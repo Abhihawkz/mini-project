@@ -20,7 +20,7 @@ COPY --from=builder /usr/src/app/node_modules ./node_modules
 COPY --from=builder /usr/src/app ./
 
 ENV PORT=4000
-ENV MONGO_URI=mongodb://localhost:27017/ai-app
+ENV MONGO_URI=mongodb://chat-network:27017/ai-app
 ENV ACCESS_TOKEN_SECRET=replace_with_strong_random_secret
 ENV REFRESH_TOKEN_SECRET=replace_with_another_secret
 ENV ACCESS_TOKEN_EXPIRES_IN=15m

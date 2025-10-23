@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-const base_url = "http://localhost:4000";
-const chat_url = "http://localhost:8000";
+const base_url = "http://chat-network:4000";
+const chat_url = "http://chat-network:8000";
 
 export const useAuthStore = create((set, get) => ({
   accessToken: localStorage.getItem('accessToken') || null,
@@ -8,7 +8,6 @@ export const useAuthStore = create((set, get) => ({
   user: JSON.parse(localStorage.getItem('user') || 'null'),
   loading: false,
   
-  // Chat state
   messages: [],
   isLoading: false,
 
@@ -27,7 +26,7 @@ export const useAuthStore = create((set, get) => ({
       accessToken: null, 
       refreshToken: null, 
       user: null,
-      messages: [] // Clear messages on logout
+      messages: [] 
     });
   },
 
@@ -104,7 +103,6 @@ export const useAuthStore = create((set, get) => ({
     get().clearAuth();
   },
 
-  // Chat functionality
   sendMessage: async (message) => {
     const userMessage = {
       id: Date.now(),
