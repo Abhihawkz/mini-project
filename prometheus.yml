@@ -1,0 +1,41 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    monitor: 'chat-app-monitor'
+
+# Alertmanager configuration (optional)
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+
+# Load rules once and periodically evaluate them
+rule_files:
+  # - "alerts.yml"
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Agon FastAPI service
+  - job_name: 'agon-chatbot'
+    scrape_interval: 10s
+    scrape_timeout: 5s
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['agon:8000']
+        labels:
+          service: 'agon'
+          environment: 'production'
+
+  - job_name: 'backend-auth'
+    scrape_interval: 10s
+    scrape_timeout: 5s
+    metrics_path: '/api/auth/metrics'
+    static_configs:
+      - targets: ['backend:4000']
+        labels:
+          service: 'backend'
+          environment: 'production'

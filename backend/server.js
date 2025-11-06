@@ -18,7 +18,9 @@ const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/ai-app";
 await connectDB(MONGO_URI);
 
 app.use("/api/auth", authRoutes);
-
+app.get("/",(req,res)=>{
+  res.json({msg:"server is running..!"})
+})
 app.get("/api/profile", authMiddleware, (req, res) => {
   res.json({ message: "This is protected", user: req.user });
 });

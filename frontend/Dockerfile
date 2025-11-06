@@ -1,35 +1,33 @@
-FROM node:18-alpine AS build
+# -------------------------------
+# Stage 1: Build
+# -------------------------------
+FROM node:22.12.0-alpine AS build
 
 WORKDIR /app
 
+# Copy dependency files first (for better caching)
 COPY package*.json ./
 
-RUN npm ci --only=production
+# Install all dependencies (including devDependencies)
+RUN npm ci
 
+# Copy project files
 COPY . .
 
+# Build the project
 RUN npm run build
 
-#####################################################
+
+# -------------------------------
+# Stage 2: Serve with NGINX
+# -------------------------------
 FROM nginx:alpine
 
+# Copy built files from previous stage
 COPY --from=build /app/dist /usr/share/nginx/html
 
-
-RUN echo "server {" > /etc/nginx/conf.d/default.conf && \
-    echo "    listen 80;" >> /etc/nginx/conf.d/default.conf && \
-    echo "    location / {" >> /etc/nginx/conf.d/default.conf && \
-    echo "        root /usr/share/nginx/html;" >> /etc/nginx/conf.d/default.conf && \
-    echo "        index index.html index.htm;" >> /etc/nginx/conf.d/default.conf && \
-    echo "        try_files \$uri \$uri/ /index.html;" >> /etc/nginx/conf.d/default.conf && \
-    echo "    }" >> /etc/nginx/conf.d/default.conf && \
-    echo "    error_page 500 502 503 504 /50x.html;" >> /etc/nginx/conf.d/default.conf && \
-    echo "    location = /50x.html {" >> /etc/nginx/conf.d/default.conf && \
-    echo "        root /usr/share/nginx/html;" >> /etc/nginx/conf.d/default.conf && \
-    echo "    }" >> /etc/nginx/conf.d/default.conf && \
-    echo "}" >> /etc/nginx/conf.d/default.conf
-
+# Configure NGINX
+COPY --from=build /app/nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
-
 CMD ["nginx", "-g", "daemon off;"]

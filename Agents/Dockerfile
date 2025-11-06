@@ -10,7 +10,7 @@ COPY main.py .
 
 RUN pip install --upgrade pip && \
     pip install fastapi uvicorn langchain langchain-google-genai langchain-core python-dotenv && \
-    pip install langchain-core
+    pip install langchain-core  prometheus-client
 
 COPY . .
 
