@@ -1,0 +1,20 @@
+jenkins:
+  systemMessage: "Jenkins for Mini-Project CI/CD"
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+      - id: "admin"
+        password: "admin123"
+  authorizationStrategy:
+    globalMatrix:
+      permissions:
+      - "Overall/Read:admin"
+      - "Overall/Administer:admin"
+  crumbIssuer:
+    standard:
+      excludeClientIPFromCrumb: true
+
+unclassified:
+  location:
+    url: "http://localhost:8080/"

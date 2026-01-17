@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: agents
+  namespace: mini-project
+spec:
+  selector:
+    app: agents
+  ports:
+  - port: 8000
+    targetPort: 8000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agents
+  namespace: mini-project
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: agents
+  template:
+    metadata:
+      labels:
+        app: agents
+    spec:
+      containers:
+      - name: agents
+        image: nginx:alpine
+        ports:
+        - containerPort: 8000
+        env:
+        - name: PYTHONUNBUFFERED
+          value: "1"
+        command: ["sh", "-c", "echo 'Agents API running on port 8000' && nginx -g 'daemon off;'"]
